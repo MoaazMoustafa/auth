@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class MailService {
   constructor(private configService: ConfigService) {}
+  private logger = new Logger(MailService.name);
+
   private emailServiceEmailAddress = this.configService.get<string>(
     'emailServiceEmailAddress',
   );
@@ -29,7 +31,7 @@ export class MailService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       this.transporter.sendMail(mailOptions, (err, response) => {
         if (err) {
-          console.error('There was an error: ', err);
+          this.logger.error('Error sending email.', err);
           return reject('Error sending email.');
         }
         resolve('Recovery email sent.');

@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   Req,
+  Logger
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -35,15 +36,18 @@ export class UserService {
     private readonly mailService: MailService,
   ) {}
 
+  private logger = new Logger(UserService.name);
   async signup(signupInput: SignupInput): Promise<DoneResponse> {
     const { email, password, passwordConfirmation } = signupInput;
 
     if (password !== passwordConfirmation) {
+      this.logger.error('Passwords do not match.');
       throw new BadRequestException('Passwords do not match.');
     }
 
     const existingUser = await this.userModel.findOne({email});
     if (existingUser) {
+      this.logger.error('Email already exists.');
       throw new BadRequestException('Email already exists.');
     }
 
@@ -68,6 +72,7 @@ export class UserService {
     const { email, password } = signinInput;
     const user = await this.userModel.findOne({ email });
     if (!user) {
+      this.logger.error('User not found.');
       throw new UnauthorizedException();
     }
     if (!user.validPassword(password)) {
@@ -140,7 +145,7 @@ export class UserService {
         accessToken,
       };
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
       throw new UnauthorizedException();
     }
   }

@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -17,6 +18,7 @@ export class AuthGuard implements CanActivate {
     private configService: ConfigService
   ) {}
 
+  private logger = new Logger(AuthGuard.name)
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
@@ -33,6 +35,7 @@ export class AuthGuard implements CanActivate {
       }
       request['user'] = user;
     } catch {
+      this.logger.error('Invalid token');
       throw new UnauthorizedException();
     }
     return true;
