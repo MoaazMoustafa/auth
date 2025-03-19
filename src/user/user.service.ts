@@ -158,7 +158,7 @@ export class UserService {
       user.resetPasswordExpires = new Date(Date.now() + 3600000);
       await user.save();
   
-      const resetLink = `${this.configService.get<string>('frontendUrl')}/users/reset-password/${token}`;
+      const resetLink = `${this.configService.get<string>('frontendUrl')}/reset-password/${token}`;
   
       const text = `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
       Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n
