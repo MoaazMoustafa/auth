@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
-// import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { User, UserSchema } from './user.schema';
     JwtModule.register({
       global: true,
     }),
-    // MailModule,
+    MailModule,
   ],
   controllers: [UserController],
   providers: [UserService],

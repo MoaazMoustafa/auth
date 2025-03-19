@@ -15,7 +15,7 @@ export class SignupInput {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(2)
+  @MinLength(3)
   @MaxLength(50)
   name: string;
 
@@ -39,22 +39,22 @@ export class SigninInput {
   password: string;
 }
 
-// export class ForgetPasswordInput {
-//   @IsEmail()
-//   @IsNotEmpty()
-//   email: string;
-// }
+export class ForgetPasswordInput {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
 
-// export class ResetPasswordInput {
-//   @IsString()
-//   @IsNotEmpty()
-//   @IsStrongPassword()
-//   password: string;
+export class ResetPasswordInput {
+  @IsString()
+  @IsNotEmpty()
+  @IsStrongPassword()
+  password: string;
 
-//   @IsString()
-//   @IsNotEmpty()
-//   passwordConfirmation: string;
-// }
+  @IsString()
+  @IsNotEmpty()
+  passwordConfirmation: string;
+}
 
 export class DoneResponse {
   done: boolean;

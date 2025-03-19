@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -11,13 +12,14 @@ import { UserModule } from './user/user.module';
       isGlobal: true,
     }),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule], // Ensure ConfigModule is available
-      inject: [ConfigService], // Inject ConfigService
+      imports: [ConfigModule], 
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('mongoUrl'), // Get MONGO_URI from .env
+        uri: configService.get<string>('mongoUrl'),
       }),
     }),
     UserModule,
+    MailModule
   ],
   controllers: [AppController],
   providers: [AppService],

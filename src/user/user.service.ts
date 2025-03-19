@@ -14,22 +14,16 @@ import {
   SignupInput,
   SigninInput,
   LoginStatusEnum,
-  DoneResponse
+  DoneResponse,
+  ResetPasswordInput,
+  ForgetPasswordInput
 } from './user.types';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ms = require('ms');
-// import {
-//   accessSecret,
-//   accessExpiry,
-//   refreshSecret,
-//   refreshExpiry,
-//   frontendUrl,
-// } from '../config';
-// import { MailService } from '../mail/mail.service';
-// import { DoneResponse, PaginationInput, PaginationResult } from '../common';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -38,7 +32,7 @@ export class UserService {
     private readonly userModel: Model<UserDocument>,
     private readonly jwtService: JwtService,
     private configService: ConfigService,
-    // private readonly mailService: MailService,
+    private readonly mailService: MailService,
   ) {}
 
   async signup(signupInput: SignupInput): Promise<DoneResponse> {
@@ -151,55 +145,58 @@ export class UserService {
     }
   }
 
-  // async forgetPassword(
-  //   forgetPasswordInput: ForgetPasswordInput,
-  // ): Promise<DoneResponse> {
-  //   const { email } = forgetPasswordInput;
-  //   const user = await this.userModel.findOne({ email });
-  //   if (!user) {
-  //     throw new NotFoundException();
-  //   }
-  //   const token = crypto.randomBytes(20).toString('hex');
-  //   user.resetPasswordToken = token;
-  //   user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+  async forgetPassword(
+    forgetPasswordInput: ForgetPasswordInput,
+  ): Promise<DoneResponse> {
+    const { email } = forgetPasswordInput;
+    const user = await this.userModel.findOne({ email });
+  
+    // Always return the same response, even if the user does not exist
+    if (user) {
+      const token = crypto.randomBytes(20).toString('hex');
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = new Date(Date.now() + 3600000);
+      await user.save();
+  
+      const resetLink = `${this.configService.get<string>('frontendUrl')}/users/reset-password/${token}`;
+  
+      const text = `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+      Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n
+      ${resetLink}\n\n
+      If you did not request this, please ignore this email and your password will remain unchanged.\n`;
+  
+      await this.mailService.sendMail(email, 'Password Reset', text);
+    }
+  
+    return {
+      done: true,
+      code: 'PASSWORD_RESET_SUCCESS',
+      message: 'Password reset email sent if the email exists.',
+    };
+  }
+  
 
-  //   await user.save();
-  //   const resetLink = `${frontendUrl}/users/reset-password/${token}`;
-
-  //   const text = `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-  //   Please click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n
-  //   ${resetLink}\n\n
-  //   If you did not request this, please ignore this email and your password will remain unchanged.\n`;
-
-  //   await this.mailService.sendMail(email, 'Password Reset', text);
-  //   return {
-  //     done: true,
-  //     code: 'PASSWORD_RESET_SUCCESS',
-  //     message: 'Password reset email sent.',
-  //   };
-  // }
-
-  // async resetPassword(token: string, resetPasswordInput: ResetPasswordInput) {
-  //   const { password, passwordConfirmation } = resetPasswordInput;
-  //   const user = await this.userModel.findOne({ resetPasswordToken: token });
-  //   if (!user || user.resetPasswordExpires < new Date()) {
-  //     throw new NotFoundException(
-  //       'Password reset token is invalid or has expired.',
-  //     );
-  //   }
-  //   if (password !== passwordConfirmation) {
-  //     throw new BadRequestException('Passwords do not match.');
-  //   }
-  //   user.setPassword(password);
-  //   user.resetPasswordToken = null;
-  //   user.resetPasswordExpires = null;
-  //   await user.save();
-  //   return {
-  //     done: true,
-  //     code: 'PASSWORD_RESET_SUCCESS',
-  //     message: 'Password reset successful.',
-  //   };
-  // }
+  async resetPassword(token: string, resetPasswordInput: ResetPasswordInput) {
+    const { password, passwordConfirmation } = resetPasswordInput;
+    const user = await this.userModel.findOne({ resetPasswordToken: token });
+    if (!user || user.resetPasswordExpires < new Date()) {
+      throw new NotFoundException(
+        'Password reset token is invalid or has expired.',
+      );
+    }
+    if (password !== passwordConfirmation) {
+      throw new BadRequestException('Passwords do not match.');
+    }
+    user.setPassword(password);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+    return {
+      done: true,
+      code: 'PASSWORD_RESET_SUCCESS',
+      message: 'Password reset successful.',
+    };
+  }
 
 
 }

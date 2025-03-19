@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   const port = configService.get<number>('PORT') || 3000;
+  app.enableCors();
   await app.listen(port);
 }
 bootstrap();

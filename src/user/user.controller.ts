@@ -6,14 +6,17 @@ import {
   Res,
   Req,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   SignupInput,
   SigninInput,
+  DoneResponse,
+  ForgetPasswordInput,
+  ResetPasswordInput
 } from './user.types';
 import { AuthGuard } from './guards/auth.guard';
-// import { DoneResponse } from '../common';
 import { User } from './user.schema';
 
 @Controller('users')
@@ -47,18 +50,18 @@ export class UserController {
   }
 
 
-  // @Post('forget-password')
-  // forgetPassword(
-  //   @Body() forgetPasswordInput: ForgetPasswordInput,
-  // ): Promise<DoneResponse> {
-  //   return this.userService.forgetPassword(forgetPasswordInput);
-  // }
+  @Post('forget-password')
+  forgetPassword(
+    @Body() forgetPasswordInput: ForgetPasswordInput,
+  ): Promise<DoneResponse> {
+    return this.userService.forgetPassword(forgetPasswordInput);
+  }
 
-  // @Post('reset-password/:token')
-  // resetPassword(
-  //   @Param('token') token: string,
-  //   @Body() resetPasswordInput: ResetPasswordInput,
-  // ): Promise<DoneResponse> {
-  //   return this.userService.resetPassword(token, resetPasswordInput);
-  // }
+  @Post('reset-password/:token')
+  resetPassword(
+    @Param('token') token: string,
+    @Body() resetPasswordInput: ResetPasswordInput,
+  ): Promise<DoneResponse> {
+    return this.userService.resetPassword(token, resetPasswordInput);
+  }
 }
