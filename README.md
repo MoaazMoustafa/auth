@@ -11,6 +11,7 @@ A robust authentication service built with NestJS, featuring user management, JW
 - 📝 Swagger API documentation
 - 🧪 Comprehensive testing setup
 - 🔍 Input validation
+- 🖋️ E2E testing
 
 ## Prerequisites
 
