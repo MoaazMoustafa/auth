@@ -8,6 +8,7 @@ import {
   UseGuards,
   Param,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import {
   SignupInput,
@@ -29,6 +30,7 @@ export class UserController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   signin(
     @Body() signinInput: SigninInput,
     @Req() req,
@@ -51,6 +53,7 @@ export class UserController {
 
 
   @Post('forget-password')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   forgetPassword(
     @Body() forgetPasswordInput: ForgetPasswordInput,
   ): Promise<DoneResponse> {
