@@ -6,8 +6,9 @@ import * as cookieParser from 'cookie-parser';
 import * as morgan from 'morgan';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+import { NestExpressApplication } from '@nestjs/platform-express';
+export default async function bootstrap(logger?) {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, logger);
   const configService = app.get(ConfigService);
   const config = new DocumentBuilder()
     .setTitle('My API')
@@ -24,7 +25,11 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors();
   app.use(morgan('combined'));
-  const port = configService.get<number>('PORT') || 3000; 
-  await app.listen(port);
+  
+  if (process.env.NODE_ENV !== 'test') {
+    const port = configService.get<number>('PORT') || 3000; 
+    await app.listen(port);
+  }
+  return app;
 }
 bootstrap();
