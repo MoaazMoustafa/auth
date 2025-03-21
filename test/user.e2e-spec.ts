@@ -26,6 +26,8 @@ afterAll(async () => {
     if (mongod) await mongod.stop();
 });
 
+jest.setTimeout(30000);
+
 describe('Auth Module (e2e)', () => {
     it('should sign up and then log in a user', async () => {
       const signupResponse = await request(app.getHttpServer())

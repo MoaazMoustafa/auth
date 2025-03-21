@@ -24,9 +24,9 @@ export default async function bootstrap(logger?) {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.enableCors();
-  app.use(morgan('combined'));
   
   if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan('combined'));
     const port = configService.get<number>('PORT') || 3000; 
     await app.listen(port);
   }
