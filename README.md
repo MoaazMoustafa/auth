@@ -12,6 +12,7 @@ A robust authentication service built with NestJS, featuring user management, JW
 - 🧪 Comprehensive testing setup
 - 🔍 Input validation
 - 🖋️ E2E testing
+- 🛡️ CI/CD
 
 ## Prerequisites
 
